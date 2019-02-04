@@ -1,8 +1,7 @@
 // Program to manually control the ESC/Motor
 // while measuring the arm's angle
 
-#include "Servo.h"
-#include "MsTimer2.h"
+#include "Servo.h" 
 
 #define ESC_PIN       (6)   // PWM pin for signaling ESC
 #define DRIVE_PIN     (10)  // Drive pin for power MOSFET
@@ -66,14 +65,6 @@ void setSpeed(int input_speed){
   ESC.writeMicroseconds(us);
 }
 
-void sensorPrint() {
-  sensorVal = analogRead(SENSOR_PIN);
-  Serial.print("Sensor Reading: ");
-  Serial.print(sensorVal);
-  Serial.print("\tFiltered Angle Reading: ");
-  Serial.println(filter(-0.3656*sensorVal+185.64), 2); // Insert your angle equation here if it is different than the default
-}
-
 void setup() {
   // Initialize serial communication
   Serial.begin(115200);
@@ -87,14 +78,9 @@ void setup() {
 
   // Arm ESC
   arm();
-
-  // Attach ISR for timer interrupt
-  MsTimer2::set(10, sensorPrint); // Print data once per 10ms
-  MsTimer2::start();
 }
 
 void loop() {
-  // Check for user input
   if (Serial.available()) {
     // Check for calibration request
     if (Serial.peek() == 'c') {
@@ -108,4 +94,10 @@ void loop() {
       setSpeed(speed);
     }
   }
+
+  sensorVal = analogRead(SENSOR_PIN);
+  Serial.print("Sensor Reading: ");
+  Serial.print(sensorVal);
+  Serial.print("\tFiltered Angle Reading: ");
+  Serial.println(-filter(-0.3656*sensorVal+185.64), 2); // Insert your angle equation here if it is different than the default
 }
